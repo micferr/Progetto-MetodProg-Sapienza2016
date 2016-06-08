@@ -458,12 +458,12 @@ public class Othello implements GameRuler<PieceModel<Species>> {
 
     private Next<PieceModel<PieceModel.Species>> getNext() {
         class Fast {
-            Othello o;
-            int fCurrPlInd;
-            List<Change> changesThisTurn;
+            private Othello o;
+            private int fCurrPlInd;
+            private List<Change> changesThisTurn;
             Change addChange, swapChange;
-            int left, right, bottom, top;
-            int oLeft, oRight, oBottom, oTop; // Old
+            private int left, right, bottom, top;
+            private int oLeft, oRight, oBottom, oTop; // Old
             public Fast(Othello o, int l, int b, int r, int t) {
                 this.o = o;
                 this.fCurrPlInd = o.currentPlayerIndex;

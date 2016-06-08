@@ -312,13 +312,6 @@ public interface GameRuler<P> {
      */
     default Situation<P> toSituation() {
         int turn = result() == -1 ? turn() : -result();
-        /**
-         * La creazione di una mappa è in conflitto con il costruttore
-         * di Situation (mappa letta senza copia)? La mappa creata qui
-         * non influenza la board di this, cioè si comporta da copia,
-         * ma GameRuler non prevede che la mappa di pezzi possa essere
-         * esposta
-         */
         Map<Pos, P> pieceMap = new HashMap<>();
         for (P piece : mechanics().pieces) {
             for (Pos pos : getBoard().get(piece)) {

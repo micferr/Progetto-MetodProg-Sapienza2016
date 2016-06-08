@@ -48,7 +48,7 @@ public class RandPlayer<P> implements Player<P> {
     public void moved(int i, Move<P> m) {
         if (game != null && game.result() == -1) {
             if (m != null) {
-                if (/*i == game.turn()*/game.isPlaying(i) && game.isValid(m)) { //Todo: Indice di UN o DEL giocatore?
+                if (/*i == game.turn()*/game.isPlaying(i) && game.isValid(m)) {
                     game.move(m);
                 } else {
                     throw new IllegalArgumentException("Illegal turn or move.");

@@ -8,9 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by micfe on 19/05/2016.
- */
 public class TestProbe2 {
     public static void main(String[] args) {
         Othello o = new Othello(0,6,"a","b");

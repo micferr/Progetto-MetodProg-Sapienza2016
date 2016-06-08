@@ -151,11 +151,11 @@ public class Probe {
             Set<S> start
     ) {
         Set<S> nextEncodedSituations = new HashSet<>();
-        long min=-1, max=Long.MAX_VALUE, sum=0;
+        long min=0, max=0, sum=0;
         boolean firstProcessed = false;
         for (S sitEnc : start) {
             NSSingle<S> nextSingle = nextSituationsSingle(nextF, dec, enc, sitEnc);
-            if (nextSingle == null) return null;
+            if (nextSingle == null) return null; //Check interruption
             if (!firstProcessed) {
                 firstProcessed = true;
                 min = max = sum = nextSingle.size;
@@ -163,7 +163,7 @@ public class Probe {
                 long numSituations = nextSingle.size;
                 min = numSituations < min ? numSituations : min;
                 max = numSituations > max ? numSituations : max;
-                sum += numSituations; //Le prossime situazioni sono un Set, quindi sum =/= nextEncodedSituations.size()
+                sum += numSituations;
             }
             for (S nextSit : nextSingle.next) {
                 if (Thread.currentThread().isInterrupted()) return null;
@@ -183,7 +183,6 @@ public class Probe {
         List<Future<NSSingle<S>>> tasks = new ArrayList<>(start.size());
         try {
             for (S sitEnc : start) {
-
                 tasks.add(exec.submit(() -> nextSituationsSingle(nextF, dec, enc, sitEnc)));
                 if (Thread.currentThread().isInterrupted()) return null;
             }
@@ -223,20 +222,21 @@ public class Probe {
     ) {
         Situation<P> decoded = dec.apply(start);
         Set<S> nextEncS = new HashSet<>();
-        for (Situation<P> s : nextF.get(decoded).values()) {
+        Collection<Situation<P>> situations = nextF.get(decoded).values();
+        for (Situation<P> s : situations) {
             if (Thread.currentThread().isInterrupted()) return null;
             nextEncS.add(enc.apply(s));
         }
-        return new NSSingle<S>(nextEncS);
+        return new NSSingle<S>(nextEncS, situations.size());
     }
 
     private static class NSSingle<S> {
         /** Insieme delle prossime situazioni */
         public final Set<S> next;
-        /** next.size() */
+        /** grado della situazione */
         public final long size;
 
-        public NSSingle(Set<S> next) {
+        public NSSingle(Set<S> next, long size) {
             this.next = next;
             this.size = next.size();
         }

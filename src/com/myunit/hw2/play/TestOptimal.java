@@ -16,9 +16,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public class TestOptimal {
+
     public static void main(String[] args) {
-        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, false, null)));
-        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, true, null)));
+        /*tryOrPrintStackTrace(() -> measureTime(() -> testOptimalOthello6x6(false, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalOthello6x6(true, null)));*/
+        //tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, false, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(3, 3, 3, false, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(4, 3, 4, true, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(5, 3, 5, true, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(4, 3, 4, false, null)));
+        tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(5, 3, 5, false, null)));
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, false, "cartellainesistente")));
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, false, "cartellainesistente")));
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(2, 2, 2, true, "cartellainesistente")));
@@ -41,8 +48,8 @@ public class TestOptimal {
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(7, 7, 2, false, null)));
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(4, 4, 4, false, null)));
         tryOrPrintStackTrace(() -> measureTime(() -> testOptimalMNK(4, 4, 4, true, null)));
-        checkInterruptSequential(4, 4, 3, false);
-        checkInterruptSequential(4, 4, 3, true);
+        measureTime(()->checkInterruptSequential(4, 4, 3, false));
+        measureTime(()->checkInterruptSequential(4, 4, 3, true));
     }
 
     public static void print(String msg) {
@@ -118,6 +125,27 @@ public class TestOptimal {
         int win = 0, tie = 0, loss = 0;
         for (int i = 0; i < 1000; ++i) {
             MNKgame res = (MNKgame) Utils.play(gF, Objects.requireNonNull(oP), new RandPlayer<PieceModel<PieceModel.Species>>("b"));
+            if (res.result() == 0) tie++;
+            else if (res.result() == 1) win++;
+            else loss++;
+        }
+        System.out.println("Win: " + win + " - Loss: " + loss + " - Tie: " + tie);
+    }
+
+    public static void testOptimalOthello6x6(boolean parallel, String directory) {
+        System.out.println("Testing Othello6x6, " + (parallel ? "Parallel" : "Sequential") + ", "
+                + (directory != null ? "Saving to/Loading from " + directory : "Without setting a directory"));
+        OthelloFactory gF = new OthelloFactory();
+        gF.setPlayerNames("a", "b");
+        gF.params().get(1).set("6x6");
+        Othello game = (Othello) gF.newGame();
+        OptimalPlayerFactory<PieceModel<PieceModel.Species>> pF = new OptimalPlayerFactory<>();
+        if (directory != null) pF.setDir(Paths.get("strategies"));
+        pF.tryCompute(gF, parallel, () -> false);
+        Player oP = pF.newPlayer(gF, "a");
+        int win = 0, tie = 0, loss = 0;
+        for (int i = 0; i < 1000; ++i) {
+            Othello res = (Othello) Utils.play(gF, Objects.requireNonNull(oP), new RandPlayer<PieceModel<PieceModel.Species>>("b"));
             if (res.result() == 0) tie++;
             else if (res.result() == 1) win++;
             else loss++;

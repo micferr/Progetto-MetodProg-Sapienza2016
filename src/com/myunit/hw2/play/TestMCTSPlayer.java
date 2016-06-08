@@ -10,8 +10,8 @@ import gapp.ulg.play.RandPlayer;
 
 public class TestMCTSPlayer {
     public static void main(String[] args) {
-        doTest(false, 100, 100, "No limit");
-        doTest(true,  100, 100, "No limit");
+        doTest(false, 30, 4, "No limit");
+        doTest(true,  30, 4, "No limit");
     }
 
     private static void doTest(boolean parallel, int rollouts, int times, String timePerMove) {

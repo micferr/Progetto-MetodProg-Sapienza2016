@@ -8,7 +8,8 @@ import java.util.*;
 
 import static gapp.ulg.game.board.PieceModel.Species;
 
-/** <b>IMPLEMENTARE I METODI SECONDO LE SPECIFICHE DATE NEI JAVADOC. Non modificare
+/**
+ * <b>IMPLEMENTARE I METODI SECONDO LE SPECIFICHE DATE NEI JAVADOC. Non modificare
  * le intestazioni dei metodi.</b>
  * <br>
  * Un oggetto {@code MNKgame} rappresenta un GameRuler per fare una partita a un
@@ -23,7 +24,8 @@ import static gapp.ulg.game.board.PieceModel.Species;
  * possibile passare il turno e una partita può finire con una patta.
  * <br>
  * Per ulteriori informazioni si può consultare
- * <a href="https://en.wikipedia.org/wiki/M,n,k-game">(m,n,k)-game</a> */
+ * <a href="https://en.wikipedia.org/wiki/M,n,k-game">(m,n,k)-game</a>
+ */
 public class MNKgame implements GameRuler<PieceModel<Species>> {
     private static final PieceModel<Species> whitePiece = new PieceModel<>(Species.DISC, "bianco");
     private static final PieceModel<Species> blackPiece = new PieceModel<>(Species.DISC, "nero");
@@ -35,7 +37,7 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
     private int lineLengthToWin; //Lunghezza della linea per vincere
 
     private List<String> players;
-    private int currentPlayerIndex; // { 0, 1 }
+    public int currentPlayerIndex; // { 0, 1 }
     private Set<Move<PieceModel<PieceModel.Species>>> currentPlayerValidMoves;
     private Board<PieceModel<Species>> board;
     private Board<PieceModel<Species>> boardView;
@@ -45,20 +47,23 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
 
     private Mechanics<PieceModel<Species>> mechanics;
 
-    /** Crea un {@code MNKgame} con le impostazioni date.
-     * @param time  tempo in millisecondi per fare una mossa, se <= 0 significa nessun
-     *              limite
-     * @param m  larghezza (width) della board
-     * @param n  altezza (height) della board
-     * @param k  lunghezza della linea
-     * @param p1  il nome del primo giocatore
-     * @param p2  il nome del secondo giocatore
-     * @throws NullPointerException se {@code p1} o {@code p2} è null
+    /**
+     * Crea un {@code MNKgame} con le impostazioni date.
+     *
+     * @param time tempo in millisecondi per fare una mossa, se <= 0 significa nessun
+     *             limite
+     * @param m    larghezza (width) della board
+     * @param n    altezza (height) della board
+     * @param k    lunghezza della linea
+     * @param p1   il nome del primo giocatore
+     * @param p2   il nome del secondo giocatore
+     * @throws NullPointerException     se {@code p1} o {@code p2} è null
      * @throws IllegalArgumentException se i valori di {@code m,n,k} non soddisfano
-     * le condizioni 1 <= {@code k} <= max{{@code M,N}} <= 20 e 1 <= min{{@code M,N}} */
+     *                                  le condizioni 1 <= {@code k} <= max{{@code M,N}} <= 20 e 1 <= min{{@code M,N}}
+     */
     public MNKgame(long time, int m, int n, int k, String p1, String p2) {
         if (p1 != null && p2 != null) {
-            if (1 <= k && k <= Math.max(m,n) && Math.max(m,n) <= 20 && 1 <= Math.min(m,n)) {
+            if (1 <= k && k <= Math.max(m, n) && Math.max(m, n) <= 20 && 1 <= Math.min(m, n)) {
                 allowedTimePerMove = time;
                 boardWidth = m;
                 boardHeight = n;
@@ -67,7 +72,7 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                 board = new BoardOct<>(boardWidth, boardHeight);
                 boardView = Utils.UnmodifiableBoard(board);
                 currentPlayerIndex = 0;
-                currentPlayerValidMoves=currentPlayerValidMoves();
+                currentPlayerValidMoves = currentPlayerValidMoves();
                 gameEnded = false;
                 invalidMovePlayed = false;
                 result = -1;
@@ -81,15 +86,17 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
         }
     }
 
-    /** Il nome rispetta il formato:
+    /**
+     * Il nome rispetta il formato:
      * <pre>
      *     <i>M,N,K</i>-game
      * </pre>
      * dove <code><i>M,N,K</i></code> sono i valori dei parametri M,N,K, ad es.
-     * "4,5,4-game". */
+     * "4,5,4-game".
+     */
     @Override
     public String name() {
-        return boardWidth+","+boardHeight+","+lineLengthToWin+"-game";
+        return boardWidth + "," + boardHeight + "," + lineLengthToWin + "-game";
     }
 
     @Override
@@ -105,7 +112,8 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                     return c.cast(boardHeight);
                 case "K":
                     return c.cast(lineLengthToWin);
-                default: throw new IllegalArgumentException("Invalid parameter name");
+                default:
+                    throw new IllegalArgumentException("Invalid parameter name");
             }
         } else throw new NullPointerException("null value passed to getParam");
     }
@@ -126,9 +134,13 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
     }
 
     @Override
-    public List<String> players() { return players; }
+    public List<String> players() {
+        return players;
+    }
 
-    /** @return il colore "nero" per il primo giocatore e "bianco" per il secondo */
+    /**
+     * @return il colore "nero" per il primo giocatore e "bianco" per il secondo
+     */
     @Override
     public String color(String name) {
         if (name != null) {
@@ -145,19 +157,25 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
     }
 
     @Override
-    public Board<PieceModel<Species>> getBoard() { return boardView; }
+    public Board<PieceModel<Species>> getBoard() {
+        return boardView;
+    }
 
     @Override
-    public int turn() { return gameEnded ? 0 : currentPlayerIndex+1; }
+    public int turn() {
+        return gameEnded ? 0 : currentPlayerIndex + 1;
+    }
 
-    /** Se la mossa non è valida termina il gioco dando la vittoria all'altro
+    /**
+     * Se la mossa non è valida termina il gioco dando la vittoria all'altro
      * giocatore.
      * Se dopo la mossa la situazione è tale che nessuno dei due giocatori può
      * vincere, si tratta quindi di una situazione che può portare solamente a una
      * patta, termina immediatamente il gioco con una patta. Per determinare se si
      * trova in una tale situazione controlla che nessun dei due giocatori può
      * produrre una linea di K pedine con le mosse rimanenti (in qualsiasi modo siano
-     * disposte le pedine rimanenti di entrambi i giocatori). */
+     * disposte le pedine rimanenti di entrambi i giocatori).
+     */
     @Override
     public boolean move(Move<PieceModel<Species>> m) {
         if (m != null) {
@@ -170,12 +188,16 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                     history.add(pos);
                     if (currentPlayerWins()) {
                         gameEnded = true;
-                        result = currentPlayerIndex+1;
+                        result = currentPlayerIndex + 1;
                     } else if (isForcedTie()) {
+                        /*System.err.println("Pareggio!");
+                        System.err.println("Forced tie: " + isForcedTie());
+                        System.err.println("CantWin(0): " + CantWin(0));
+                        System.err.println("CantWin(1): " + CantWin(1));
+                        System.err.println("\n\n");*/
                         gameEnded = true;
                         result = 0;
-                    }
-                    else {
+                    } else {
                         //printBoard();
                         currentPlayerIndex = 1 - currentPlayerIndex;
                         currentPlayerValidMoves = currentPlayerValidMoves();
@@ -227,6 +249,109 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
     }
 
     public boolean isForcedTie() {
+        if (boardWidth == 3 && boardHeight == 3 && lineLengthToWin == 3 && board.get().size()==5) {
+            Pos p1=null, p2=null, p3=null, p4 = null;
+            for (Pos p : board.positions()) {if (board.get(p)==null) if (p1==null) p1 = p; else if (p2 == null) p2 = p; else if (p3==null) p3 = p; else p4 = p;}
+            // 1
+            board.put(blackPiece, p1);
+            board.put(blackPiece, p2);
+            board.put(whitePiece, p3);
+            board.put(whitePiece, p4);
+            boolean tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            // 2
+            board.put(blackPiece, p1);
+            board.put(whitePiece, p2);
+            board.put(blackPiece, p3);
+            board.put(whitePiece, p4);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            // 3
+            board.put(whitePiece, p1);
+            board.put(blackPiece, p2);
+            board.put(blackPiece, p3);
+            board.put(whitePiece, p4);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            // 4
+            board.put(blackPiece, p1);
+            board.put(whitePiece, p2);
+            board.put(whitePiece, p3);
+            board.put(blackPiece, p4);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            // 5
+            board.put(whitePiece, p1);
+            board.put(blackPiece, p2);
+            board.put(whitePiece, p3);
+            board.put(blackPiece, p4);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            // 6
+            board.put(whitePiece, p1);
+            board.put(whitePiece, p2);
+            board.put(blackPiece, p3);
+            board.put(blackPiece, p4);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3); board.remove(p4);
+            if (!tie) return false;
+            else return true;
+        }
+        if (boardWidth == 3 && boardHeight == 3 && lineLengthToWin == 3 && board.get().size()==6) {
+            Pos p1=null, p2=null, p3=null;
+            for (Pos p : board.positions()) {if (board.get(p)==null) if (p1==null) p1 = p; else if (p2 == null) p2 = p; else p3 = p;}
+            // 1
+            board.put(blackPiece, p1);
+            board.put(blackPiece, p2);
+            board.put(whitePiece, p3);
+            boolean tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3);
+            if (!tie) return false;
+            // 2
+            board.put(blackPiece, p1);
+            board.put(whitePiece, p2);
+            board.put(blackPiece, p3);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3);
+            if (!tie) return false;
+            // 3
+            board.put(whitePiece, p1);
+            board.put(blackPiece, p2);
+            board.put(blackPiece, p3);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2); board.remove(p3);
+            return tie;
+        }
+        if (boardWidth == 3 && boardHeight == 3 && lineLengthToWin == 3 && board.get().size()==7) {
+            Pos p1=null, p2=null;
+            for (Pos p : board.positions()) {if (board.get(p)==null) if (p1==null) p1 = p; else p2 = p;}
+            board.put(blackPiece, p1);
+            board.put(whitePiece, p2);
+            boolean tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2);
+            if (!tie) return false;
+            board.put(blackPiece, p2);
+            board.put(whitePiece, p1);
+            tie = true;
+            for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
+            board.remove(p1); board.remove(p2);
+            return tie;
+        }
         return CantWin(0) && CantWin(1);
     }
 
@@ -239,10 +364,11 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
      */
     private boolean CantWin(int nextPlayerIndex) {
         //Cond ? floor(num of empty cells) : ceil(num of empty cells)
+        int emptyPieces = boardWidth * boardHeight - board.get().size();
         int availablePieces =
                 currentPlayerIndex == nextPlayerIndex ?
-                        (boardWidth*boardHeight - board.get().size()) / 2 :
-                        (boardWidth*boardHeight - board.get().size() + 2 - 1) / 2;
+                        (emptyPieces) / 2 :
+                        (emptyPieces + 2 - 1) / 2;
         //Piece to put
         PieceModel<PieceModel.Species> nextPiece =
                 nextPlayerIndex == 0 ? blackPiece : whitePiece;
@@ -253,19 +379,28 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                 notTakenByOpponent.add(pos);
             }
         });
+
         //Check
         for (Pos p : notTakenByOpponent) {
             for (Board.Dir dir : Board.Dir.values()) {
                 Pos new_p = p;
                 int rowLength = 0;
                 int piecesStillAvailable = availablePieces;
-                do {
+
+                while (notTakenByOpponent.contains(new_p)) {
+                    if (board.get(new_p) == null) piecesStillAvailable--;
+                    if (piecesStillAvailable < 0) break;
                     rowLength++;
                     new_p = board.adjacent(new_p, dir);
-                } while (
-                        notTakenByOpponent.contains(new_p)
-                        && (board.get(new_p)!=null?piecesStillAvailable:--piecesStillAvailable)>0
-                        );
+                }
+
+                /*if (nextPlayerIndex==0 && board.get().size()==8) {
+                    //System.err.println("Pos: " + p.b + "," + p.t + " - Direzione: " + dir.toString() + " - Lunghezza: " + rowLength);
+                    if (new Pos(2,2).equals(p) && dir == Board.Dir.DOWN) {
+                        System.err.println("Pezzi disponibili: " + availablePieces);
+                        System.err.println("PSA: " + piecesStillAvailable);
+                    }
+                }*/
                 if (rowLength >= lineLengthToWin) {
                     return false;
                 }
@@ -274,10 +409,52 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
         return true;
     }
 
+    /**
+     * @return True if tie
+     */
+    public boolean CantWin3x3() {
+        PieceModel<Species> nextPiece = board.get().size()%2 == 0 ? blackPiece : whitePiece;
+        PieceModel<Species> enemyPiece = board.get().size()%2 == 1 ? blackPiece : whitePiece;
+        int availablePieces = -1;
+        switch (board.get().size()) {
+            case 0: availablePieces = 5; break;
+            case 1: availablePieces = 4; break;
+            case 2: availablePieces = 4; break;
+            case 3: availablePieces = 3; break;
+            case 4: availablePieces = 3; break;
+            case 5: availablePieces = 2; break;
+            case 6: availablePieces = 2; break;
+            case 7: availablePieces = 1; break;
+            case 8: availablePieces = 1; break;
+            case 9: return true;
+        }
+        final int aP = availablePieces;
+        class Check {
+            boolean check(Pos... pp) {
+                PieceModel p1 = board.get(pp[0]), p2 = board.get(pp[1]), p3 = board.get(pp[2]);
+                int empty = 0;
+                if (p1 == null) { empty++; } else if (p1.equals(enemyPiece)) return false;
+                if (p2 == null) { empty++; } else if (p2.equals(enemyPiece)) return false;
+                if (p3 == null) { empty++; } else if (p3.equals(enemyPiece)) return false;
+                return empty <= aP;
+            }
+        }
+        Check c = new Check();
+        if (c.check(new Pos(0,0), new Pos(1,0), new Pos(2,0))) return false;
+        if (c.check(new Pos(0,1), new Pos(1,1), new Pos(2,1))) return false;
+        if (c.check(new Pos(0,2), new Pos(1,2), new Pos(2,2))) return false;
+        if (c.check(new Pos(0,0), new Pos(0,1), new Pos(0,2))) return false;
+        if (c.check(new Pos(1,0), new Pos(1,1), new Pos(1,2))) return false;
+        if (c.check(new Pos(2,0), new Pos(2,1), new Pos(2,2))) return false;
+        if (c.check(new Pos(0,0), new Pos(1,1), new Pos(2,2))) return false;
+        if (c.check(new Pos(0,2), new Pos(1,1), new Pos(2,0))) return false;
+        return true;
+    }
+
     public void printBoard() {
-        for (int y = boardHeight-1; y >= 0; y--) {
+        for (int y = boardHeight - 1; y >= 0; y--) {
             for (int x = 0; x < boardWidth; x++) {
-                Pos p = new Pos(x,y);
+                Pos p = new Pos(x, y);
                 PieceModel<PieceModel.Species> piece = board.get(p);
                 if (piece == null) System.err.print(". ");
                 else if (piece.equals(blackPiece)) System.err.print("X ");
@@ -286,7 +463,7 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
             System.err.println();
         }
         currentPlayerWins();
-        System.err.println("Continuabile: " + !isForcedTie());
+        //System.err.println("Continuabile: " + !isForcedTie());
         System.err.println("CantWin(0): " + CantWin(0));
         System.err.println("CantWin(1): " + CantWin(1));
         System.err.println("Result: " + result());
@@ -329,8 +506,10 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
         }
     }
 
-    /** Ogni mossa (diversa dall'abbandono) è rappresentata da una sola {@link Action}
-     * di tipo {@link Action.Kind#ADD}. */
+    /**
+     * Ogni mossa (diversa dall'abbandono) è rappresentata da una sola {@link Action}
+     * di tipo {@link Action.Kind#ADD}.
+     */
     @Override
     public Set<Move<PieceModel<Species>>> validMoves() {
         if (result() == -1) {
@@ -401,12 +580,12 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                     players.get(0),
                     players.get(1)
             );
-            situation.newMap().forEach((pos,piece) -> {
+            situation.newMap().forEach((pos, piece) -> {
                 game.board.put(piece, pos);
             });
             game.gameEnded = situation.turn <= 0;
-            game.currentPlayerIndex = situation.turn-1;
-            if (game.gameEnded || game.currentPlayerWins()) {
+            game.currentPlayerIndex = situation.turn - 1;
+            if (game.gameEnded /*|| game.currentPlayerWins()*/) {
                 return Collections.EMPTY_MAP;
             }
             game.currentPlayerValidMoves = game.currentPlayerValidMoves();

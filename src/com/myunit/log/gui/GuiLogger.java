@@ -31,6 +31,7 @@ public class GuiLogger extends Application implements Logger {
     private static MultiLogger externalLogger = null;
     private static Class[] testClasses = new Class[]{};
     private static volatile boolean initialized = false;
+
     /**
      * Signal whether the test execution has been interrupted,
      * e.g. by closing the test window.

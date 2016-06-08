@@ -92,10 +92,12 @@ public class OptimalPlayer<P> implements Player<P> {
         }
     }
 
+    long overTime=0;
     @Override
     public Move<P> getMove() {
         if (game != null && game.result() == -1 && game.players().get(game.turn()-1).equals(name())) { //Todo ??????????????
-            return strategy.move(toSituation(game), mechanics.next);
+            Move<P> move = strategy.move(toSituation(game), mechanics.next);
+            return move;
         } else {
             throw new IllegalStateException();
         }

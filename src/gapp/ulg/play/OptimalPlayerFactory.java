@@ -21,10 +21,7 @@ import java.io.*;
 import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -169,6 +166,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
                 String res = parallel ?
                         tryComputeParallel(gF, interrupt) :
                         tryComputeSequential(gF, interrupt);
+                //String res = tryComputeSequential(gF, interrupt);
                 //Save strategy to file
                 if (res == null && dirPath != null) {
                     File f = dirPath.toFile();
@@ -269,7 +267,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
     }
 
     private void checkInterrupt(Supplier<Boolean> interrupt) {
-        if (interrupt != null && interrupt.get()) throw new ExecutionInterruptedException();
+        if (Thread.currentThread().isInterrupted() || (interrupt != null && interrupt.get())) throw new ExecutionInterruptedException();
     }
 
     private String tryComputeParallel(GameFactory<? extends GameRuler<P>> gF, Supplier<Boolean> interrupt) {
@@ -285,17 +283,17 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
             Situation<P> start = mechanics.start;
             Map<Probe.EncS<P>, BinaryResult> strategyMap = new ConcurrentHashMap<>();
             checkInterrupt(interrupt);
-            ForkJoinPool fjPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+            /*ForkJoinPool fjPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
             ForkJoinTask fjMainTask = ForkJoinTask.adapt(
-                    () -> buildStrategyMapForkJoin2(
+                    () -> */buildStrategyMapForkJoin(
                             start,
                             strategyMap,
                             mechanics,
-                            //interrupt != null ? new InterruptionDetectorSupplier(interrupt) : null
                             interrupt
-                    )
-            );
-            fjPool.invoke(fjMainTask);
+                    /*)
+            */);
+            /*fjPool.invoke(fjMainTask);
+            fjMainTask.join();*/
 
             OptimalStrategy<P> optimalStrategy = new OptimalStrategy<>(game.name(), mechanics);
             optimalStrategy.setChoiceMap(strategyMap);
@@ -379,16 +377,16 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
     }
 
     private void buildStrategyMapForkJoin2(
-            Situation<P> start,
-            Map<Probe.EncS<P>, BinaryResult> strategyMap,
+            Situation<P> start, Map<Probe.EncS<P>,
+            BinaryResult> strategyMap,
             GameRuler.Mechanics<P> mechanics,
             Supplier<Boolean> interrupt
     ) {
-        throw new UnsupportedOperationException("DA IMPLEMENTARE :'(");
+        Runtime.getRuntime().exit(-42);
     }
 
     private boolean checkInterruptForkJoin(Supplier<Boolean> interrupt) {
-        return interrupt != null && interrupt.get();
+        return Thread.currentThread().isInterrupted() || (interrupt != null && interrupt.get());
     }
 
     /**
@@ -407,7 +405,13 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
                 strategies.put(gameName, strategy);
             }
             return new OptimalPlayer<>(Objects.requireNonNull(name), strategies.get(gameName));
-        } else throw new IllegalStateException("Cannot play game: \""+gF.newGame().name()+"\"");
+        } else {
+            String playableGames = "";
+            for (String s : strategies.keySet()) {
+                playableGames += s + " ";
+            }
+            throw new IllegalStateException("Cannot play game: \""+gF.newGame().name()+"\" - ");
+        }
     }
 
     private Path dirPath = null;
