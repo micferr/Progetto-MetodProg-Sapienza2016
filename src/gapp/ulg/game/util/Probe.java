@@ -155,7 +155,7 @@ public class Probe {
         boolean firstProcessed = false;
         for (S sitEnc : start) {
             NSSingle<S> nextSingle = nextSituationsSingle(nextF, dec, enc, sitEnc);
-            if (nextSingle == null) return null; //Check interruption
+            if (nextSingle == null) return null; // Controlla interruzione
             if (!firstProcessed) {
                 firstProcessed = true;
                 min = max = sum = nextSingle.size;

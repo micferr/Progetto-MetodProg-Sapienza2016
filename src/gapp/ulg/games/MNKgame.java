@@ -249,7 +249,7 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
     }
 
     public boolean isForcedTie() {
-        if (boardWidth == 3 && boardHeight == 3 && lineLengthToWin == 3 && board.get().size()==5) {
+        /*if (boardWidth == 3 && boardHeight == 3 && lineLengthToWin == 3 && board.get().size()==5) {
             Pos p1=null, p2=null, p3=null, p4 = null;
             for (Pos p : board.positions()) {if (board.get(p)==null) if (p1==null) p1 = p; else if (p2 == null) p2 = p; else if (p3==null) p3 = p; else p4 = p;}
             // 1
@@ -351,7 +351,7 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
             for (Pos p : board.positions()) if (isPartOfCompleteLine(p)) tie = false;
             board.remove(p1); board.remove(p2);
             return tie;
-        }
+        }*/
         return CantWin(0) && CantWin(1);
     }
 
@@ -394,13 +394,6 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
                     new_p = board.adjacent(new_p, dir);
                 }
 
-                /*if (nextPlayerIndex==0 && board.get().size()==8) {
-                    //System.err.println("Pos: " + p.b + "," + p.t + " - Direzione: " + dir.toString() + " - Lunghezza: " + rowLength);
-                    if (new Pos(2,2).equals(p) && dir == Board.Dir.DOWN) {
-                        System.err.println("Pezzi disponibili: " + availablePieces);
-                        System.err.println("PSA: " + piecesStillAvailable);
-                    }
-                }*/
                 if (rowLength >= lineLengthToWin) {
                     return false;
                 }
@@ -409,46 +402,39 @@ public class MNKgame implements GameRuler<PieceModel<Species>> {
         return true;
     }
 
-    /**
-     * @return True if tie
-     */
-    public boolean CantWin3x3() {
-        PieceModel<Species> nextPiece = board.get().size()%2 == 0 ? blackPiece : whitePiece;
-        PieceModel<Species> enemyPiece = board.get().size()%2 == 1 ? blackPiece : whitePiece;
-        int availablePieces = -1;
-        switch (board.get().size()) {
-            case 0: availablePieces = 5; break;
-            case 1: availablePieces = 4; break;
-            case 2: availablePieces = 4; break;
-            case 3: availablePieces = 3; break;
-            case 4: availablePieces = 3; break;
-            case 5: availablePieces = 2; break;
-            case 6: availablePieces = 2; break;
-            case 7: availablePieces = 1; break;
-            case 8: availablePieces = 1; break;
-            case 9: return true;
-        }
-        final int aP = availablePieces;
-        class Check {
-            boolean check(Pos... pp) {
-                PieceModel p1 = board.get(pp[0]), p2 = board.get(pp[1]), p3 = board.get(pp[2]);
-                int empty = 0;
-                if (p1 == null) { empty++; } else if (p1.equals(enemyPiece)) return false;
-                if (p2 == null) { empty++; } else if (p2.equals(enemyPiece)) return false;
-                if (p3 == null) { empty++; } else if (p3.equals(enemyPiece)) return false;
-                return empty <= aP;
+    public boolean isForcedTie2() {
+        if (boardWidth != 3 || boardHeight != 3 || lineLengthToWin != 3) return isForcedTie();
+
+        class Checker {
+            int maxEmpty;
+            PieceModel<Species> p;
+            boolean check(Pos... pp) { //True if line is available
+                int e=0;
+                for (Pos pos : pp) {
+                    if (board.get(pos) == null) e++;
+                    else if (!p.equals(board.get(pos))) return false;
+                }
+                return e<=maxEmpty;
+            }
+            boolean isTie() {
+                Pos p00 = new Pos(0,0), p01 = new Pos(0,1), p02 = new Pos(0,2), p10 = new Pos(1,0), p11 = new Pos(1,1),
+                        p12 = new Pos(1,2), p20 = new Pos(2,0), p21 = new Pos(2,1), p22 = new Pos(2,2);
+                return !(
+                        check(p00, p01, p02) || check(p10, p11, p12) || check(p20, p21, p22) || check(p00, p10, p20) ||
+                                check(p01, p11, p21) || check(p02, p12, p22) || check(p00,p11,p22) || check(p02,p11,p20)
+                        );
             }
         }
-        Check c = new Check();
-        if (c.check(new Pos(0,0), new Pos(1,0), new Pos(2,0))) return false;
-        if (c.check(new Pos(0,1), new Pos(1,1), new Pos(2,1))) return false;
-        if (c.check(new Pos(0,2), new Pos(1,2), new Pos(2,2))) return false;
-        if (c.check(new Pos(0,0), new Pos(0,1), new Pos(0,2))) return false;
-        if (c.check(new Pos(1,0), new Pos(1,1), new Pos(1,2))) return false;
-        if (c.check(new Pos(2,0), new Pos(2,1), new Pos(2,2))) return false;
-        if (c.check(new Pos(0,0), new Pos(1,1), new Pos(2,2))) return false;
-        if (c.check(new Pos(0,2), new Pos(1,1), new Pos(2,0))) return false;
-        return true;
+
+        int empty = boardWidth*boardHeight-board.get().size();
+        //Check first player
+        int availableBlackPosition = currentPlayerIndex == 0 ? (int)Math.floor(empty/2.0) : (int)Math.ceil(empty/2.0);
+        Checker c = new Checker(); c.maxEmpty=availableBlackPosition; c.p = blackPiece;
+        boolean tieB = c.isTie();
+        if (!tieB) return false;
+        int availableWhitePosition = currentPlayerIndex == 1 ? (int)Math.floor(empty/2.0) : (int)Math.ceil(empty/2.0);
+        c.maxEmpty = availableWhitePosition; c.p = whitePiece;
+        return c.isTie();
     }
 
     public void printBoard() {

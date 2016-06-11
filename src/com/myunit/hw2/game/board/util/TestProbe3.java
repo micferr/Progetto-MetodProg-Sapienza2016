@@ -2,11 +2,13 @@ package com.myunit.hw2.game.board.util;
 
 import gapp.ulg.game.board.GameRuler;
 import gapp.ulg.game.board.PieceModel;
+import gapp.ulg.game.board.Pos;
 import gapp.ulg.game.util.Probe;
 import gapp.ulg.games.MNKgame;
 import gapp.ulg.games.Othello;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -14,7 +16,6 @@ import java.util.function.Supplier;
 public class TestProbe3 {
     public static void main(String[] args) {
         test(false, ()->new MNKgame(-1,3,3,3,"a","b"), 10);
-        test(true, ()->new MNKgame(-1,3,3,3,"a","b"), 10);
     }
 
     public static void test(boolean parallel, Supplier<GameRuler<PieceModel<PieceModel.Species>>> gR, int depth) {
@@ -38,9 +39,27 @@ public class TestProbe3 {
                 if (s.turn < 0) finali++;
                 else if (s.turn == 0) patte++;
                 else nonFinite++;
+                printBoardOneRow(s);
             }
-            System.out.println("Depth " + (i+1) + " : Size = " + encSet.size() + " | Finali: " + finali + " | Patte: " + patte + " | Non finite: " + nonFinite);
+            System.out.println("Depth " + (i+1) + " : Size = " + encSet.size() + " | Finite con vittoria di un giocatore: " + finali + " | Patte: " + patte + " | Non finite: " + nonFinite);
         }
         System.out.println();
+    }
+
+
+    public static void printBoardOneRow(GameRuler.Situation<PieceModel<PieceModel.Species>> s) {
+        Pos pp[] = new Pos[9];
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                pp[y*3+x] = new Pos(x,y);
+            }
+        }
+        Map<Pos, PieceModel<PieceModel.Species>> mp = s.newMap();
+        String r = "";
+        for (Pos pos : pp) {
+            if (mp.get(pos) == null) r += ".";
+            else r += mp.get(pos).color.equals("nero") ? "X" : "O";
+        }
+        System.out.println(r + " " + s.turn);
     }
 }

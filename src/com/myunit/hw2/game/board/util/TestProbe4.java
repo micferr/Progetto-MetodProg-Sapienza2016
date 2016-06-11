@@ -61,7 +61,7 @@ public class TestProbe4 {
         g.move(moveX10);
         g.move(moveO11);
         g.move(moveX21);
-        //g.move(moveO12);
+        g.move(moveO01);
         g.printBoard();
         //g.move(move)
     }
