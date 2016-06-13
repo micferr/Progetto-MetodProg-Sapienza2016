@@ -182,104 +182,6 @@ public class TestOthello {
     }
 
     @Test
-    @Sorted(170)
-    public void mechanics_ControllaRisultatoDiNextAnizioPartita() {
-        PieceModel<PieceModel.Species> blackPiece = new PieceModel<>(PieceModel.Species.DISC, "nero");
-        PieceModel<PieceModel.Species> whitePiece = new PieceModel<>(PieceModel.Species.DISC, "bianco");
-        class X {
-            public GameRuler.Situation<PieceModel<PieceModel.Species>> toSituation(Othello o) {
-                Map<Pos, PieceModel<PieceModel.Species>> oPieceMap = new HashMap<>();
-                for (Pos p : o.getBoard().get(blackPiece))
-                    oPieceMap.put(p, blackPiece);
-                for (Pos p : o.getBoard().get(whitePiece))
-                    oPieceMap.put(p, whitePiece);
-                int oTurn = o.turn();
-                return new GameRuler.Situation<>(oPieceMap, oTurn);
-            }
-        }
-        X x = new X();
-
-        //Actual
-        Othello o = new Othello("a","b");
-        Map<Move<PieceModel<PieceModel.Species>>, GameRuler.Situation<PieceModel<PieceModel.Species>>> actualNext =
-                o.mechanics().next.get(x.toSituation(o));
-
-        //Expected
-        Action<PieceModel<PieceModel.Species>> add_2_4 = new Action<>(new Pos(2,4), blackPiece);
-        Action<PieceModel<PieceModel.Species>> add_3_5 = new Action<>(new Pos(3,5), blackPiece);
-        Action<PieceModel<PieceModel.Species>> add_4_2 = new Action<>(new Pos(4,2), blackPiece);
-        Action<PieceModel<PieceModel.Species>> add_5_3 = new Action<>(new Pos(5,3), blackPiece);
-        Action<PieceModel<PieceModel.Species>> swap_3_4 = new Action<>(blackPiece, new Pos(3,4));
-        Action<PieceModel<PieceModel.Species>> swap_4_3 = new Action<>(blackPiece, new Pos(4,3));
-        Move<PieceModel<PieceModel.Species>> move1 = new Move<>(add_2_4, swap_3_4);
-        Move<PieceModel<PieceModel.Species>> move2 = new Move<>(add_3_5, swap_3_4);
-        Move<PieceModel<PieceModel.Species>> move3 = new Move<>(add_4_2, swap_4_3);
-        Move<PieceModel<PieceModel.Species>> move4 = new Move<>(add_5_3, swap_4_3);
-        o.move(move1);
-        GameRuler.Situation<PieceModel<PieceModel.Species>> situation1 = x.toSituation(o);
-        o.unMove();
-        o.move(move2);
-        GameRuler.Situation<PieceModel<PieceModel.Species>> situation2 = x.toSituation(o);
-        o.unMove();
-        o.move(move3);
-        GameRuler.Situation<PieceModel<PieceModel.Species>> situation3 = x.toSituation(o);
-        o.unMove();
-        o.move(move4);
-        GameRuler.Situation<PieceModel<PieceModel.Species>> situation4 = x.toSituation(o);
-        Map<Move<PieceModel<PieceModel.Species>>, GameRuler.Situation<PieceModel<PieceModel.Species>>> expectedNext =
-                new HashMap<>();
-        expectedNext.put(move1, situation1);
-        expectedNext.put(move2, situation2);
-        expectedNext.put(move3, situation3);
-        expectedNext.put(move4, situation4);
-        assertEquals(
-                actualNext.size(),
-                expectedNext.size(),
-                "Dimensioni mappa ritornata dall'oggetto Next a inizio partita errate: " + actualNext.size()
-        );
-        assertEquals(
-                actualNext.keySet(),
-                expectedNext.keySet(),
-                "La mappa ritornata ha chiavi errate"
-        );
-
-        if (!expectedNext.equals(actualNext)) {
-            int k = 0;
-            for (Move<PieceModel<PieceModel.Species>> m : expectedNext.keySet()) {
-                System.out.println("Mossa " + (++k));
-                System.out.println("\tKind:" + m.kind);
-                System.out.println("\tActions: ");
-                int i = 0;
-                for (Action<PieceModel<PieceModel.Species>> a : m.actions) {
-                    System.out.println("\t\tAction " + (i++));
-                    System.out.println("\t\t\tKind " + a.kind);
-                    System.out.println("\t\t\tPos ");
-                    for (Pos p : a.pos) System.out.println("\t\t\t\t" + p.b + " - " + p.t);
-                }
-
-                GameRuler.Situation<PieceModel<PieceModel.Species>> actS = actualNext.get(m), expS = expectedNext.get(m);
-                System.out.println();
-                System.out.println("\tActual:");
-                Map<Pos, PieceModel<PieceModel.Species>> actSM = actS.newMap();
-                for (Pos p : actSM.keySet()) {
-                    String s = blackPiece.equals(actSM.get(p)) ? "B" : whitePiece.equals(actSM.get(p)) ? "W" : "Err";
-                    System.out.println("\t\t" + s + " at " + "(" + p.b + ", " + p.t + ")");
-                }
-                System.out.println("\t\tTurn: " + actS.turn);
-                System.out.println();
-                System.out.println("\tExpected:");
-                Map<Pos, PieceModel<PieceModel.Species>> expSM = actS.newMap();
-                for (Pos p : expSM.keySet()) {
-                    String s = blackPiece.equals(expSM.get(p)) ? "B" : whitePiece.equals(expSM.get(p)) ? "W" : "Err";
-                    System.out.println("\t\t" + s + " at " + "(" + p.b + ", " + p.t + ")");
-                }
-                System.out.println("\t\tTurn: " + expS.turn);
-            }
-            fail("Guarda System.out");
-        }
-    }
-
-    @Test
     @Sorted(180)
     public void mechanics_ControllaNextFinePartita() {
         PieceModel<PieceModel.Species> blackPiece = new PieceModel<>(PieceModel.Species.DISC, "nero");
@@ -309,121 +211,16 @@ public class TestOthello {
         assertEquals(next.get(x.toSituation(o)), Collections.EMPTY_MAP);
     }
 
-    @Test
-    @Sorted(190)
-    public void mechanics_ControllaNextUnTurnoPrimaDellaFinePuoFinireInUnaMossa() {
-        /*PieceModel<PieceModel.Species> blackPiece = new PieceModel<>(PieceModel.Species.DISC, "nero");
-        PieceModel<PieceModel.Species> whitePiece = new PieceModel<>(PieceModel.Species.DISC, "bianco");
-        class X {
-            public GameRuler.Situation<PieceModel<PieceModel.Species>> toSituation(Othello o) {
-                Map<Pos, PieceModel<PieceModel.Species>> oPieceMap = new HashMap<>();
-                for (Pos p : o.getBoard().get(blackPiece))
-                    oPieceMap.put(p, blackPiece);
-                for (Pos p : o.getBoard().get(whitePiece))
-                    oPieceMap.put(p, whitePiece);
-                int oTurn = o.result()!=-1 ? o.turn() : -o.result();
-                return new GameRuler.Situation<>(oPieceMap, oTurn);
-            }
-        }
-        X x = new X();
-        int success=0;
-        for (int t = 0; t < 50; t++) { //Test statistico
-            OthelloFactory oF = new OthelloFactory();
-            oF.setPlayerNames("a", "b");
-            Othello o = (Othello) Utils.play(oF, new RandPlayer<>("a"), new RandPlayer<>("a"));
-            int risultato1 = o.result();
-            o.unMove();
-            assertEquals(o.result(), -1);
-            for (Move<PieceModel<PieceModel.Species>> m : o.validMoves()) {
-                if (m.kind.equals(Move.Kind.RESIGN)) continue;
-                o.move(m);
-                int risultato2 = o.result();
-                o.unMove();
-                if (risultato2 == risultato1) {
-                    success++;
-                    break;
-                }
-            }
-            GameRuler.Next<PieceModel<PieceModel.Species>> next = o.mechanics().next;
-            assertEquals(next.get(x.toSituation(o)).size(), o.validMoves().size()-1);
-            for (Move<PieceModel<PieceModel.Species>> m : o.validMoves()) {
-                if (m.kind.equals(Move.Kind.RESIGN)) continue;
-                Map<Pos, PieceModel<PieceModel.Species>> mapSit = next.get(x.toSituation(o)).get(m).newMap();
-                assertEquals(
-                        mapSit,
-                        x.toSituation(o).newMap()
-                );
-                Othello o2 = (Othello)o.copy();
-                o.move(m);
-                assertEquals(
-                        next.get(x.toSituation(o2)).get(m).turn,
-                        o.result() == -1 ? o.turn() : -o.result(),
-                        "Primo: " + next.get(x.toSituation(o2)).get(m).turn + "\tSecondo: " + (o.result() == -1 ? o.turn() : -o.result())
-                );
-                System.out.println(next.get(x.toSituation(o2)).get(m).turn + "\t" + (o.result() == -1 ? o.turn() : -o.result()));
-                o.unMove();
-            }
-        }
-        assertEquals(success, 50);*/
-        fail("Test da implementare");
-    }
-
     @Test(expected = UnsupportedOperationException.class)
     @Sorted(200)
     public void mechanics_ControllaRisultatoImmutabile() {
         new Othello("a","b").mechanics().positions.add(new Pos(10,10));
     }
 
-    /*@Test
-    @Sorted(210)
-    public void mechanics_Situation_TurnInizioPartita() {
-        PieceModel<PieceModel.Species> blackPiece = new PieceModel<>(PieceModel.Species.DISC, "nero");
-        PieceModel<PieceModel.Species> whitePiece = new PieceModel<>(PieceModel.Species.DISC, "bianco");class X {
-            public GameRuler.Situation<PieceModel<PieceModel.Species>> toSituation(Othello o) {
-                Map<Pos, PieceModel<PieceModel.Species>> oPieceMap = new HashMap<>();
-                for (Pos p : o.getBoard().get(blackPiece))
-                    oPieceMap.put(p, blackPiece);
-                for (Pos p : o.getBoard().get(whitePiece))
-                    oPieceMap.put(p, whitePiece);
-                int oTurn = o.result()==-1 ? o.turn() : -o.result();
-                return new GameRuler.Situation<>(oPieceMap, oTurn);
-            }
-        }
-        X x = new X();
-        int expTurn = 1;
-        Othello othello = new Othello("a","b");
-        assertEquals(x.toSituation(othello).turn, expTurn, "Turn errato a inizio partita");
-    }*/
-
-    /*@Test
-    @Sorted(220)
-    public void mechanics_Situation_FinePartita() {
-        PieceModel<PieceModel.Species> blackPiece = new PieceModel<>(PieceModel.Species.DISC, "nero");
-        PieceModel<PieceModel.Species> whitePiece = new PieceModel<>(PieceModel.Species.DISC, "bianco");
-        class X {
-            public GameRuler.Situation<PieceModel<PieceModel.Species>> toSituation(Othello o) {
-                Map<Pos, PieceModel<PieceModel.Species>> oPieceMap = new HashMap<>();
-                for (Pos p : o.getBoard().get(blackPiece))
-                    oPieceMap.put(p, blackPiece);
-                for (Pos p : o.getBoard().get(whitePiece))
-                    oPieceMap.put(p, whitePiece);
-                int oTurn = o.result()!=-1 ? o.turn() : -o.result();
-                return new GameRuler.Situation<>(oPieceMap, oTurn);
-            }
-        }
-        X x = new X();
-        OthelloFactory oF = new OthelloFactory();
-        oF.setPlayerNames("a","b");
-        Othello o = (Othello)Utils.play(oF, new RandPlayer<PieceModel<PieceModel.Species>>("a"), new RandPlayer<PieceModel<PieceModel.Species>>("b"));
-        assertEquals(
-                x.toSituation(o).turn, o.turn(),
-                "Actual: " + x.toSituation(o).turn + "\tExpected: " + o.turn() + "\tOthello.Result(): " + o.result()
-        );
-    }*/
-
     @Test
     @Sorted(230)
     public void mechanics_OggettoRitornatoSempreLoStesso() {
-        fail("Test da implementare");
+        Othello o = new Othello("a","b");
+        assertTrue(o.mechanics() == o.mechanics(), "Test non necessario");
     }
 }

@@ -5,24 +5,20 @@ import gapp.ulg.game.Param;
 import gapp.ulg.game.PlayerFactory;
 import gapp.ulg.game.board.GameRuler;
 import gapp.ulg.game.board.Move;
-import gapp.ulg.game.board.PieceModel;
 import gapp.ulg.game.board.Player;
 import gapp.ulg.game.util.ConcreteParameter;
-import gapp.ulg.game.util.Node;
 import gapp.ulg.game.util.Probe;
 
 import static gapp.ulg.game.board.GameRuler.Situation;
 import static gapp.ulg.game.board.GameRuler.Next;
-import static gapp.ulg.play.BinaryResult.FIRST_PLAYER;
-import static gapp.ulg.play.BinaryResult.SECOND_PLAYER;
-import static gapp.ulg.play.BinaryResult.TIE;
+import static gapp.ulg.play.BinaryGameResult.FIRST_PLAYER;
+import static gapp.ulg.play.BinaryGameResult.SECOND_PLAYER;
+import static gapp.ulg.play.BinaryGameResult.TIE;
 
 import java.io.*;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -190,7 +186,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
         try {
             GameRuler.Mechanics<P> mechanics = game.mechanics();
             Situation<P> start = mechanics.start;
-            Map<Probe.EncS<P>, BinaryResult> strategyMap = new ConcurrentHashMap<>();
+            Map<Probe.EncS<P>, BinaryGameResult> strategyMap = new ConcurrentHashMap<>();
             checkInterrupt(interrupt);
             buildStrategyMap(start, strategyMap, mechanics, interrupt);
             OptimalStrategy<P> optimalStrategy = new OptimalStrategy<>(game.name(), mechanics);
@@ -209,7 +205,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
 
     private void buildStrategyMap(
             Situation<P> start,
-            Map<Probe.EncS<P>, BinaryResult> strategyMap,
+            Map<Probe.EncS<P>, BinaryGameResult> strategyMap,
             GameRuler.Mechanics<P> mechanics,
             Supplier<Boolean> interrupt
     ) {
@@ -234,7 +230,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
         } else {
             //Get next situations
             Collection<Situation<P>> nextSituations = mechanics.next.get(start).values();
-            BinaryResult winResult = start.turn == 1 ? FIRST_PLAYER : SECOND_PLAYER;
+            BinaryGameResult winResult = start.turn == 1 ? FIRST_PLAYER : SECOND_PLAYER;
             checkInterrupt(interrupt);
 
             for (Situation<P> s : nextSituations) {
@@ -250,7 +246,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
             for (Situation<P> s : nextSituations) {
                 buildStrategyMap(s, strategyMap, mechanics, interrupt);
                 checkInterrupt(interrupt);
-                BinaryResult r = strategyMap.get(new Probe.EncS<>(mechanics, s));
+                BinaryGameResult r = strategyMap.get(new Probe.EncS<>(mechanics, s));
                 if (r == winResult) {
                     strategyMap.put(encStart, winResult);
                     return;
@@ -281,7 +277,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
         try {
             GameRuler.Mechanics<P> mechanics = game.mechanics();
             Situation<P> start = mechanics.start;
-            Map<Probe.EncS<P>, BinaryResult> strategyMap = new ConcurrentHashMap<>();
+            Map<Probe.EncS<P>, BinaryGameResult> strategyMap = new ConcurrentHashMap<>();
             checkInterrupt(interrupt);
             /*ForkJoinPool fjPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
             ForkJoinTask fjMainTask = ForkJoinTask.adapt(
@@ -310,7 +306,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
     }
 
     private void buildStrategyMapForkJoin(
-            Situation<P> start, Map<Probe.EncS<P>, BinaryResult> strategyMap,
+            Situation<P> start, Map<Probe.EncS<P>, BinaryGameResult> strategyMap,
             GameRuler.Mechanics<P> mechanics,
             Supplier<Boolean> interrupt
     ) {
@@ -334,7 +330,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
         } else {
             //Get next situations
             Collection<Situation<P>> nextSituations = mechanics.next.get(start).values();
-            BinaryResult winResult = start.turn == 1 ? FIRST_PLAYER : SECOND_PLAYER;
+            BinaryGameResult winResult = start.turn == 1 ? FIRST_PLAYER : SECOND_PLAYER;
             if (checkInterruptForkJoin(interrupt)) return;
 
             for (Situation<P> s : nextSituations) {
@@ -357,7 +353,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
                 for (Situation<P> s : nextSituations) {
                     submitTasks.get(i++).get();
                     if (checkInterruptForkJoin(interrupt)) throw new InterruptedException();
-                    BinaryResult r = strategyMap.get(new Probe.EncS<>(mechanics, s));
+                    BinaryGameResult r = strategyMap.get(new Probe.EncS<>(mechanics, s));
                     if (r == winResult) {
                         strategyMap.put(encStart, winResult);
                         throw new InterruptedException();
@@ -378,7 +374,7 @@ public class OptimalPlayerFactory<P> implements PlayerFactory<Player<P>, GameRul
 
     private void buildStrategyMapForkJoin2(
             Situation<P> start, Map<Probe.EncS<P>,
-            BinaryResult> strategyMap,
+            BinaryGameResult> strategyMap,
             GameRuler.Mechanics<P> mechanics,
             Supplier<Boolean> interrupt
     ) {

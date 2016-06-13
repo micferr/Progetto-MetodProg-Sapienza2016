@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static gapp.ulg.play.BinaryResult.FIRST_PLAYER;
-import static gapp.ulg.play.BinaryResult.SECOND_PLAYER;
-import static gapp.ulg.play.BinaryResult.TIE;
+import static gapp.ulg.play.BinaryGameResult.FIRST_PLAYER;
+import static gapp.ulg.play.BinaryGameResult.SECOND_PLAYER;
+import static gapp.ulg.play.BinaryGameResult.TIE;
 
 class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
     private static class SituationEncoding<P> implements Serializable {
@@ -36,8 +36,8 @@ class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
     }
 
     private final String name;
-    private Map<Probe.EncS<P>, BinaryResult> choiceMap; //Situation - Situation's value
-    private Map<SituationEncoding<P>, BinaryResult> nChoiceMap;
+    private Map<Probe.EncS<P>, BinaryGameResult> choiceMap; //Situation - Situation's value
+    private Map<SituationEncoding<P>, BinaryGameResult> nChoiceMap;
     private final GameRuler.Mechanics<P> mechanics;
 
     public OptimalStrategy(
@@ -48,11 +48,11 @@ class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
         this.mechanics = mechanics;
     }
 
-    public void setChoiceMap(Map<Probe.EncS<P>, BinaryResult> map) {
+    public void setChoiceMap(Map<Probe.EncS<P>, BinaryGameResult> map) {
         Objects.requireNonNull(map);
         choiceMap = map;
         nChoiceMap = new HashMap<>();
-        for (Map.Entry<Probe.EncS<P>, BinaryResult> entry : map.entrySet()) {
+        for (Map.Entry<Probe.EncS<P>, BinaryGameResult> entry : map.entrySet()) {
             nChoiceMap.put(new SituationEncoding<>(entry.getKey()), entry.getValue());
         }
     }
@@ -74,7 +74,7 @@ class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
         int turn = s.turn;
         boolean first = true;
         Move<P> bestMove = null;
-        BinaryResult bestResult = null;
+        BinaryGameResult bestResult = null;
         for (Map.Entry<Move<P>, GameRuler.Situation<P>> nextPair : nextS.entrySet()) {
             SituationEncoding<P> sitEnc = new SituationEncoding<>(new Probe.EncS<>(mechanics, nextPair.getValue()));
             if (!nChoiceMap.containsKey(sitEnc)) continue;
@@ -88,8 +88,8 @@ class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
                 first = false;
             } else {
                 Move<P> currentMove = nextPair.getKey();
-                //BinaryResult currentResult = choiceMap.get(new Probe.EncS<>(mechanics, nextPair.getValue()));
-                BinaryResult currentResult =nChoiceMap.get(sitEnc);
+                //BinaryGameResult currentResult = choiceMap.get(new Probe.EncS<>(mechanics, nextPair.getValue()));
+                BinaryGameResult currentResult =nChoiceMap.get(sitEnc);
                 if (currentResult.ordinal() == turn) {
                     return currentMove;
                 } else if (currentResult == TIE && bestResult == (turn == 1 ? SECOND_PLAYER : FIRST_PLAYER)) {
@@ -122,9 +122,9 @@ class OptimalStrategy<P> implements OptimalPlayerFactory.Strategy<P> {
             FileInputStream fis = new FileInputStream(filePath);
             ObjectInputStream ois = new ObjectInputStream(fis);
             @SuppressWarnings("unchecked")
-            //Map<Probe.EncS<T>, BinaryResult> strategyMap = (Map<Probe.EncS<T>, BinaryResult>) ois.readObject();
+            //Map<Probe.EncS<T>, BinaryGameResult> strategyMap = (Map<Probe.EncS<T>, BinaryGameResult>) ois.readObject();
             //strategy.setChoiceMap(strategyMap);
-            Map<SituationEncoding<T>, BinaryResult> strategyMap = (Map<SituationEncoding<T>, BinaryResult>) ois.readObject();
+            Map<SituationEncoding<T>, BinaryGameResult> strategyMap = (Map<SituationEncoding<T>, BinaryGameResult>) ois.readObject();
             strategy.choiceMap = new HashMap<>();
             strategy.nChoiceMap = strategyMap;
             return strategy;

@@ -142,7 +142,8 @@ public class Action<P> {
     }
 
     /** Crea un'azione di tipo {@link Kind#JUMP} che muove il pezzo dalla posizione
-     * p1 alla posizione p2.
+     * p1 alla posizione p2. Le posizioni p1 e p2 sono riportate in quest'ordine
+     * nella lista di {@link Action#pos}.
      * @param p1  posizione di partenza
      * @param p2  posizione di arrivo
      * @throws NullPointerException se p1 o p2 è null
@@ -196,7 +197,8 @@ public class Action<P> {
      * {@link Action#pos}, {@link Action#dir} e {@link Action#steps}.
      * <br>
      * <b>ATTENZIONE: due liste {@link Action#pos} sono considerate uguali se
-     * contengono le stesse posizioni indipendentemente dall'ordine.</b>
+     * contengono le stesse posizioni indipendentemente dall'ordine per tutti i tipi
+     * di azione eccetto che per {@link Action.Kind#JUMP}.</b>
      * @param x  un oggetto (o null)
      * @return true se x è uguale a questa azione */
     @Override
@@ -217,6 +219,8 @@ public class Action<P> {
                 return false;
             }
         }
+
+        //todo: uguaglianza pos per azioni di tipo JUMP
         if (pos != action.pos) {
             if (pos == null || action.pos == null) {
                 return false;
