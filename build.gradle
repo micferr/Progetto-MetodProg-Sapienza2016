@@ -1,0 +1,24 @@
+apply plugin: 'java'
+
+task compileJavaClasses (type: JavaCompile)
+task runSelfTestSuite (type: JavaExec)
+task generateJavadocs (type: Javadoc)
+
+compileJavaClasses {
+ source = fileTree(dir: 'src', include: '**/*.java')
+ destinationDir = file('build/classes/main')
+ classpath = files('build/classes/main')
+}
+
+runSelfTestSuite {
+  classpath sourceSets.main.runtimeClasspath
+  main = "com.myunit.selftest.SelfTestSuite"
+  args '1'
+}
+tasks.runSelfTestSuite.dependsOn(compileJavaClasses)
+
+generateJavadocs {
+  source = fileTree(dir: 'src', include: '**/*.java')
+  destinationDir = file('docs')
+}
+tasks.generateJavadocs.dependsOn(compileJavaClasses)

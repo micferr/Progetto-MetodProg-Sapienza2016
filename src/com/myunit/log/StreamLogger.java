@@ -43,7 +43,6 @@ public class StreamLogger extends LoggerAdapter implements Logger {
         if (throwable.getMessage() != null) {
             stream.println("Exception Message: " + throwable.getMessage());
         }
-        throwable.printStackTrace();
     }
 
     @Override

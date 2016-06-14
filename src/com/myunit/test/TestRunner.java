@@ -2,7 +2,6 @@ package com.myunit.test;
 
 import com.myunit.assertion.TestFailedError;
 import com.myunit.log.Logger;
-import com.myunit.log.LoggerAdapter;
 import com.myunit.log.StreamLogger;
 
 import java.lang.annotation.Annotation;
@@ -26,7 +25,7 @@ public class TestRunner {
      * System.out.
      */
     public TestRunner() {
-        this(new LoggerAdapter());
+        this(new StreamLogger(System.out));
     }
 
     /**

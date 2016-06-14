@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
-public class FileLogger {
+public class FileLogger extends LoggerAdapter {
     private PrintStream stream;
     private String logFile;
     private String extraLogs;
