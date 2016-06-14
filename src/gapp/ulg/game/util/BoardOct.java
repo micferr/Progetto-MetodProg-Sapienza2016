@@ -12,7 +12,7 @@ import java.util.*;
  * board generali con sistema di coordinate {@link System#OCTAGONAL}
  * modificabili.
  * @param <P>  tipo del modello dei pezzi */
-public class BoardOct<P> extends ModifiableBoard<P> {
+public class BoardOct<P> extends ConcreteBoard<P> {
 
     /** Crea una BoardOct con le dimensioni date (può quindi essere rettangolare).
      * Le posizioni della board sono tutte quelle comprese nel rettangolo dato e le
@@ -21,7 +21,7 @@ public class BoardOct<P> extends ModifiableBoard<P> {
      * @param height  altezza board
      * @throws IllegalArgumentException se width <= 0 o height <= 0 */
     public BoardOct(int width, int height) {
-        this(width, height, new ArrayList<>());
+        super(width, height);
     }
 
     /** Crea una BoardOct con le dimensioni date (può quindi essere rettangolare)

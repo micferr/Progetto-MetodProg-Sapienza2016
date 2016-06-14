@@ -5,16 +5,16 @@ import gapp.ulg.game.board.Pos;
 
 import java.util.*;
 
-public abstract class ModifiableBoard<P> implements Board<P> {
+public abstract class ConcreteBoard<P> implements Board<P> {
     protected int width, height;
     protected List<Pos> positions;
     protected Map<Pos, P> pieces;
 
-    public ModifiableBoard(int width, int height) {
+    public ConcreteBoard(int width, int height) {
         this(width, height, new ArrayList<>());
     }
 
-    public ModifiableBoard(int width, int height, Collection<? extends Pos> exc) {
+    public ConcreteBoard(int width, int height, Collection<? extends Pos> exc) {
         if (exc != null) {
             if (width > 0 && height > 0) {
                 this.width = width;

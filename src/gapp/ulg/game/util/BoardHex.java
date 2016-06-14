@@ -5,16 +5,13 @@ import gapp.ulg.game.board.Pos;
 
 import java.util.*;
 
-import static gapp.ulg.game.board.Board.Dir.DOWN;
-import static gapp.ulg.game.board.Board.Dir.UP;
-
 /** <b>L'IMPLEMENTAZIONE DI QUESTA CLASSE È LASCIATA COME FALCOLTATIVA.</b>
  * <br>
  * Gli oggetti BoardHex implementano l'interfaccia {@link Board} per rappresentare
  * board generali con sistema di coordinate {@link System#HEXAGONAL}
  * modificabili.
  * @param <P>  tipo del modello dei pezzi */
-public class BoardHex<P> extends ModifiableBoard<P> {
+public class BoardHex<P> extends ConcreteBoard<P> {
 
     /** Crea una BoardHex con le dimensioni date (può quindi essere rettangolare).
      * Le posizioni della board sono tutte quelle comprese nel rettangolo dato e le
@@ -24,7 +21,7 @@ public class BoardHex<P> extends ModifiableBoard<P> {
      * @param height  altezza board
      * @throws IllegalArgumentException se width <= 0 o height <= 0 */
     public BoardHex(int width, int height) {
-        this(width, height, new ArrayList<>());
+        super(width, height);
     }
 
     /** Crea una BoardHex con le dimensioni date (può quindi essere rettangolare)
